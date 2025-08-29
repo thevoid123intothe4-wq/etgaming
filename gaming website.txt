@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GameHub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Roboto', sans-serif; background: #0f0f0f; color: #fff; overflow-x: hidden; }
+
+    a { text-decoration: none; color: inherit; }
+
+    /* Navbar */
+    nav {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1rem 2rem; background: #1b1b1b; position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+    nav h1 { font-weight: 700; font-size: 1.8rem; color: #ff3c78; letter-spacing: 1px; }
+    nav ul { display: flex; gap: 2rem; }
+    nav ul li { list-style: none; transition: 0.3s; cursor: pointer; position: relative; }
+    nav ul li::after {
+      content: ''; position: absolute; width: 0; height: 2px; background: #ff3c78; bottom: -5px; left: 0; transition: 0.3s;
+    }
+    nav ul li:hover::after { width: 100%; }
+
+    /* Hero Section */
+    .hero {
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      height: 100vh; text-align: center; background: linear-gradient(135deg, #121212, #1b1b1b);
+      animation: fadeIn 1.5s ease forwards;
+      overflow: hidden;
+    }
+    .hero h2 {
+      font-size: 3rem; margin-bottom: 1rem; color: #ff3c78;
+      animation: slideIn 1s ease forwards;
+    }
+    .hero p {
+      font-size: 1.2rem; color: #ccc; margin-bottom: 2rem; max-width: 600px;
+      animation: fadeIn 2s ease forwards;
+    }
+    .hero button {
+      padding: 0.75rem 2rem; background: linear-gradient(45deg,#ff3c78,#ff618d);
+      border: none; border-radius: 5px; cursor: pointer; font-size: 1rem;
+      transition: 0.4s; color: #fff; box-shadow: 0 0 10px rgba(255,60,120,0.5);
+    }
+    .hero button:hover { transform: scale(1.1); box-shadow: 0 0 20px rgba(255,60,120,0.8); }
+
+    /* Sections */
+    section { padding: 4rem 2rem; }
+    section h2 { text-align: center; margin-bottom: 2rem; font-size: 2.2rem; color: #ff3c78; }
+
+    /* Game Lobby */
+    .game-lobby { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; }
+    .game-card {
+      background: #1b1b1b; padding: 2rem; border-radius: 15px; text-align: center;
+      transition: 0.3s; cursor: pointer; transform-style: preserve-3d;
+    }
+    .game-card img { width: 120px; height: 120px; object-fit: cover; margin-bottom: 1rem; border-radius: 50%; transition: 0.3s; }
+    .game-card h3 { margin-bottom: 0.5rem; }
+    .game-card button {
+      padding: 0.5rem 1rem; background: linear-gradient(45deg,#ff3c78,#ff618d);
+      border: none; border-radius: 5px; cursor: pointer; transition: 0.3s; color: #fff;
+    }
+    .game-card button:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(255,60,120,0.6); }
+
+    /* 3D tilt + glow */
+    .game-card:hover {
+      transform: rotateY(10deg) rotateX(5deg) translateY(-10px);
+      box-shadow: 0 15px 25px rgba(255,60,120,0.4);
+    }
+
+    /* Animations */
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideIn { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    /* Footer */
+    footer { text-align: center; padding: 2rem; background: #1b1b1b; color: #aaa; margin-top: 2rem; }
+    footer span { display: block; margin-top: 0.5rem; color: #ff3c78; font-weight: bold; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h2 { font-size: 2.4rem; }
+      .hero p { font-size: 1rem; }
+    }
+
+    /* Background animated gradient */
+    body::before {
+      content: ""; position: fixed; top:0; left:0; width:100%; height:100%; z-index:-1;
+      background: linear-gradient(-45deg, #0f0f0f, #1b1b1b, #121212, #1b1b1b);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+    }
+    @keyframes gradientBG { 0% {background-position:0% 50%} 50% {background-position:100% 50%} 100% {background-position:0% 50%} }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav>
+    <h1>GameHub</h1>
+    <ul>
+      <li>Home</li>
+      <li>Lobby</li>
+      <li>Tournaments</li>
+      <li>Profile</li>
+    </ul>
+  </nav>
+
+  <!-- Hero Section -->
+  <div class="hero">
+    <h2>Connect. Play. Conquer.</h2>
+    <p>Join players from around the world, find your team, and dominate tournaments in your favorite games.</p>
+    <button onclick="scrollToLobby()">Enter Lobby</button>
+  </div>
+
+  <!-- Game Lobby Section -->
+  <section id="lobby">
+    <h2>Game Lobby</h2>
+    <div class="game-lobby" id="games"></div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    &copy; 2025 GameHub. All Rights Reserved.
+    <span>Created by Adonyas Elias</span>
+  </footer>
+
+  <!-- JS -->
+  <script>
+    const gamesData = [
+      {name: "Valorant", img: "https://upload.wikimedia.org/wikipedia/en/9/9f/Valorant_cover_art.jpg"},
+      {name: "CS:GO", img: "https://upload.wikimedia.org/wikipedia/en/2/25/Counter-Strike_Global_Offensive_cover_art.jpg"},
+      {name: "Fortnite", img: "https://upload.wikimedia.org/wikipedia/en/thumb/0/09/FortniteSaveTheWorld.jpg/220px-FortniteSaveTheWorld.jpg"},
+      {name: "Overwatch", img: "https://upload.wikimedia.org/wikipedia/en/5/51/Overwatch_cover_art.jpg"}
+    ];
+
+    const gamesContainer = document.getElementById('games');
+    gamesData.forEach(game => {
+      const card = document.createElement('div');
+      card.className = 'game-card';
+      card.innerHTML = `
+        <img src="${game.img}" alt="${game.name}">
+        <h3>${game.name}</h3>
+        <button onclick="joinGame('${game.name}')">Join Game</button>
+      `;
+      gamesContainer.appendChild(card);
+    });
+
+    function joinGame(name) {
+      alert('Joining ' + name + '... (mockup)');
+    }
+
+    function scrollToLobby() {
+      document.getElementById('lobby').scrollIntoView({behavior: 'smooth'});
+    }
+  </script>
+</body>
+</html>
